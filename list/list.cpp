@@ -1,14 +1,23 @@
 #include <iostream>
 
-struct Node{
-    Node* NextNode = nullptr;
+struct Node
+{
+    Node * PrevNode;
+    Node * NextNode;
     int Data;
+    Node(int InData=0)
+    {
+        PrevNode = nullptr;
+        NextNode = nullptr;
+        Data = InData;
+    }
 };
 
 class LinkedList
 {
     private:
-        Node* HeadNode;
+        Node * HeadNode;
+        Node * TailNode;
         int ElementCount;
 
     public:
@@ -16,6 +25,7 @@ class LinkedList
         ~LinkedList();
         int GetSize();
         void InsertData(int InData);
+        bool InsertBefore(int InData, int InBeforeData);
         bool DeleteData(int InData);
         int SearchData(int InData);
         void PrintList();
@@ -24,6 +34,7 @@ class LinkedList
 LinkedList::LinkedList()
 {
     HeadNode = nullptr;
+    TailNode = nullptr;
     ElementCount = 0;
 }
 
@@ -32,12 +43,16 @@ LinkedList::~LinkedList()
     if(ElementCount == 0)
     {
         delete HeadNode;
+        HeadNode = nullptr;
+        delete TailNode;
+        TailNode = nullptr;
     }
     else
     {
+        /*
         for(int i=0; i<ElementCount; i++)
         {
-            Node* TempNode = HeadNode;
+            Node * TempNode = HeadNode;
             while(TempNode)
             {
                 if(TempNode->NextNode == nullptr)
@@ -48,6 +63,7 @@ LinkedList::~LinkedList()
                 TempNode = TempNode->NextNode;
             }
         }
+        */
     }
 }
 
@@ -72,28 +88,55 @@ void LinkedList::InsertData(int InData)
 {
     if(HeadNode == nullptr)
     {
-        HeadNode = new Node();
-        HeadNode->Data = InData;
+        HeadNode = new Node(InData);
+        TailNode = HeadNode;
         ElementCount += 1;
         std::cout << "head 에 " << InData << "삽입" << std::endl;
     }
     else
     {
-        Node* TempNode = HeadNode;
-        while(TempNode != nullptr)
+        Node * TempNode = HeadNode;
+        while(TempNode->NextNode)
         {
-            if(TempNode->NextNode == nullptr)
-            {
-                TempNode->NextNode = new Node();
-                TempNode->NextNode->Data = InData;
-                ElementCount += 1;
-                std::cout << "next에 " << InData << " 삽입" << std::endl;
-                return;
-            }
-
             TempNode = TempNode->NextNode;
         }
+
+        Node * NewNode = new Node(InData);
+        NewNode->PrevNode = TempNode;
+        TempNode->NextNode = NewNode;
+        this->TailNode = NewNode;
+                
+        ElementCount += 1;
+        std::cout << "next에 " << InData << " 삽입" << std::endl;
+        return;
     }
+}
+  
+bool LinkedList::InsertBefore(int InData, int InBeforeData)
+{
+    if(HeadNode == nullptr)
+    {
+        std::cout << "BeforeData를 찾을수 없습니다." << std::endl;
+        return false;
+    }
+    else
+    {
+        Node * TempNode = TailNode;
+        if(TempNode == nullptr) return false;
+        while(TempNode->Data != InBeforeData)
+        {
+            TempNode = TempNode->PrevNode;
+        }
+
+        Node * NewNode = new Node(InData);
+        Node * TempPrevNode = TempNode->PrevNode;
+        TempPrevNode->NextNode = NewNode;
+        NewNode->PrevNode = TempPrevNode;
+        NewNode->NextNode = TempNode;
+        TempNode->PrevNode = NewNode;
+    }
+
+    return true;
 }
    
 bool LinkedList::DeleteData(int InData)
@@ -103,10 +146,11 @@ bool LinkedList::DeleteData(int InData)
         std::cout << "삭제할 데이터가 없습니다." << std::endl;
         return false;
     }
-    else{
+    else
+    {
         if(HeadNode->Data == InData)
         {
-            Node* TempNode = HeadNode;
+            Node * TempNode = HeadNode;
             HeadNode = HeadNode->NextNode;
             ElementCount -= 1;
             delete TempNode;
@@ -119,7 +163,7 @@ bool LinkedList::DeleteData(int InData)
             {
                 if(TempNode2->NextNode->Data == InData)
                 {
-                    Node* TempNode3 = TempNode2->NextNode;
+                    Node * TempNode3 = TempNode2->NextNode;
                     TempNode2->NextNode = TempNode2->NextNode->NextNode;
                     delete TempNode3;
                     ElementCount -= 1;
@@ -178,6 +222,10 @@ int main()
     linkedlist.PrintList();
     std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
 
+    linkedlist.InsertBefore(5, 20);
+    linkedlist.PrintList();
+
+    /*
     linkedlist.SearchData(10);
 
     linkedlist.DeleteData(10);
@@ -188,7 +236,7 @@ int main()
     linkedlist.DeleteData(20);
     linkedlist.PrintList();
     std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
-
+*/
 
     return 0;
 }
