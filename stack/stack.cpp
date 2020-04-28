@@ -1,61 +1,97 @@
 #include <iostream>
 
-using namespace std;
-
-const int MAX_LENGTH = 256;
-
-class Stack{
+class Stack
+{
     private:
-        int DataList[MAX_LENGTH];
+        int * DataList;
         int CurrentIndex;
+        int Length;
 
     public:
-        Stack();
+        Stack(int InLength = 0);
+        ~Stack();
         bool IsEmpty();
         int GetSize();
-        void PushData(int InData);
+        bool PushData(int InData);
         int PopData();
+        void PrintData();
 };
 
-Stack::Stack(){
+Stack::Stack(int InLength)
+{
+    DataList = new int[InLength];
+    Length = InLength;
     CurrentIndex = 0;
 }
 
-bool Stack::IsEmpty(){
+Stack::~Stack()
+{
+    delete [] DataList;
+    DataList = nullptr;
+}
+
+bool Stack::IsEmpty()
+{
     return CurrentIndex == 0;
 }
 
-int Stack::GetSize(){
+int Stack::GetSize()
+{
     return CurrentIndex;
 }
 
-void Stack::PushData(int InData){
+bool Stack::PushData(int InData)
+{
+    if(this->GetSize() >= Length)
+    {
+        std::cout << "스택이 가득 찼습니다." << std::endl;
+        return false;
+    }
+
     DataList[CurrentIndex] = InData;
     CurrentIndex += 1;
+    return true;
 }
 
-int Stack::PopData(){
+int Stack::PopData()
+{
+    if(this->GetSize() == 0)
+    {
+        std::cout << "데이터가 없습니다." << std::endl;
+        return -1;
+    }
+
     CurrentIndex -= 1;
     int OutData = DataList[CurrentIndex];
     return OutData;
 }
 
-int main(){
-    Stack StackList;
+void Stack::PrintData()
+{
+    for(int i=0; i<this->GetSize(); ++i)
+    {
+        std::cout << i << "번째 데이터 : " << DataList[i] << std::endl;
+    }
+}
 
-    cout << "스택 사이즈 : " << StackList.GetSize() << endl;
-    for(int i=0; i<5; i++)
+int main()
+{
+    Stack StackList(10);
+
+    std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
+    for(int i=0; i<15; ++i)
     {
         StackList.PushData(i);
-        cout << "push() : " << i << endl;
     }
 
-    cout << "스택 사이즈 : " << StackList.GetSize() << endl;
+    StackList.PrintData();
+    std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
 
-    for(int j=0; j<3; j++)
+    for(int j=0; j<3; ++j)
     {
-        cout << "pop() : " << StackList.PopData() << endl;
+        StackList.PopData();
     }
 
-    cout << "스택 사이즈 : " << StackList.GetSize() << endl;
+    StackList.PrintData();
+    std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
 }
