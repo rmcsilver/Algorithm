@@ -27,7 +27,8 @@ class LinkedList
         void InsertData(int InData);
         bool InsertBefore(int InData, int InBeforeData);
         bool DeleteData(int InData);
-        int SearchData(int InData);
+        Node * SearchData(int InData);
+        Node * SearchData_From_Tail(int InData);
         void PrintList();
 };
 
@@ -49,21 +50,17 @@ LinkedList::~LinkedList()
     }
     else
     {
-        /*
-        for(int i=0; i<ElementCount; i++)
+        Node * TempNode = TailNode->PrevNode;
+        while(TempNode)
         {
-            Node * TempNode = HeadNode;
-            while(TempNode)
-            {
-                if(TempNode->NextNode == nullptr)
-                {
-                    delete TempNode;
-                    break;
-                }
-                TempNode = TempNode->NextNode;
-            }
-        }
-        */
+            Node * DeleteNode = TempNode;
+            TempNode = TempNode->PrevNode;
+            delete DeleteNode;
+            DeleteNode = nullptr;
+        }   
+
+        delete TailNode;
+        TailNode = nullptr;
     }
 }
 
@@ -134,6 +131,8 @@ bool LinkedList::InsertBefore(int InData, int InBeforeData)
         NewNode->PrevNode = TempPrevNode;
         NewNode->NextNode = TempNode;
         TempNode->PrevNode = NewNode;
+        ElementCount += 1;
+        std::cout << InBeforeData << " 데이터 앞에 " << InData << " 데이터 삽입" << std::endl;
     }
 
     return true;
@@ -148,44 +147,46 @@ bool LinkedList::DeleteData(int InData)
     }
     else
     {
-        if(HeadNode->Data == InData)
+        Node * TempNode = HeadNode;
+        if(TempNode->Data == InData)
         {
-            Node * TempNode = HeadNode;
             HeadNode = HeadNode->NextNode;
-            ElementCount -= 1;
             delete TempNode;
-            std::cout << InData << " 데이터 삭제 완료" << std::endl;        
+            TempNode = nullptr;
+            ElementCount -= 1;
+            if(ElementCount == 1)   TailNode = HeadNode;
+            std::cout << InData << " 데이터 삭제 완료" << std::endl;
+            return true;
         }
-        else
+
+        TempNode = TempNode->NextNode;
+        while(TempNode)
         {
-            Node* TempNode2 = HeadNode;
-            while(TempNode2 != nullptr)
+            if(TempNode->Data == InData)
             {
-                if(TempNode2->NextNode->Data == InData)
-                {
-                    Node * TempNode3 = TempNode2->NextNode;
-                    TempNode2->NextNode = TempNode2->NextNode->NextNode;
-                    delete TempNode3;
-                    ElementCount -= 1;
-                    std::cout << InData << " 데이터 삭제 완료" << std::endl;
-                    return true;
-                }
-                else{
-                    TempNode2 = TempNode2->NextNode;
-                }
+                TempNode->PrevNode->NextNode = TempNode->NextNode;
+                TempNode->NextNode->PrevNode = TempNode->PrevNode;
+                delete TempNode;
+                TempNode = nullptr;
+                ElementCount -= 1;
+                std::cout << InData << " 데이터 삭제 완료" << std::endl;
+                return true;
             }
+            
+            TempNode = TempNode->NextNode;
         }
     }
 
+    std::cout << InData << " 데이터 삭제 실패" << std::endl;
     return false;
 }
 
-int LinkedList::SearchData(int InData)
+Node * LinkedList::SearchData(int InData)
 {
     if(HeadNode == nullptr)
     {
-        std::cout << "찾으시는 데이터가 없습니다." << std::endl;
-        return -1;
+        std::cout << "검색할 데이터가 없습니다." << std::endl;
+        return nullptr;
     }
     
     int LocalIndex = 1;
@@ -194,17 +195,41 @@ int LinkedList::SearchData(int InData)
     {
         if(TempNode->Data == InData)
         {
-            std::cout << InData << "는 " << LocalIndex << "번째 데이터 입니다." << std::endl;
-            return LocalIndex;
+            std::cout << InData << "는 앞에서 " << LocalIndex << "번째 데이터 입니다." << std::endl;
+            return TempNode;
         }
         TempNode = TempNode->NextNode;
         LocalIndex += 1;
     }
     
-    return -1;
+    return nullptr;
 }
  
+Node * LinkedList::SearchData_From_Tail(int InData)
+{
+    if(TailNode == nullptr || ElementCount == 0)
+    {
+        std::cout << "검색할 데이터가 없습니다." << std::endl;
+        return nullptr;
+    }
 
+    int LocalIndex = 1;
+    Node * TempNode = TailNode;
+    while(TempNode)
+    {
+        if(TempNode->Data == InData)
+        {
+            std::cout << InData << "는 뒤에서 " << LocalIndex << "번째 데이터 입니다." << std::endl;
+            return TempNode;
+        }
+
+        TempNode = TempNode->PrevNode;
+        LocalIndex += 1;
+    }
+
+    return nullptr;
+}
+ 
 
 int main()
 {
@@ -224,6 +249,37 @@ int main()
 
     linkedlist.InsertBefore(5, 20);
     linkedlist.PrintList();
+    std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
+
+
+    linkedlist.DeleteData(10);
+    linkedlist.PrintList();
+    std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
+
+    linkedlist.DeleteData(5);
+    linkedlist.PrintList();
+    std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
+
+    Node * FindNode = linkedlist.SearchData(20);
+    if(FindNode)
+    {
+        std::cout << FindNode << std::endl;
+    }   
+    else
+    {
+        std::cout << "데이터 찾기 실패" << std::endl;
+    }
+
+    Node * FindNode2 = linkedlist.SearchData_From_Tail(20);
+    if(FindNode2)
+    {
+        std::cout << FindNode2 << std::endl;
+    }   
+    else
+    {
+        std::cout << "데이터 찾기 실패" << std::endl;
+    }
+
 
     /*
     linkedlist.SearchData(10);
