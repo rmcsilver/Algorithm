@@ -1,15 +1,27 @@
 #include <iostream>
 
+struct Node
+{
+    Node * PrevNode = nullptr;
+    Node * NextNode = nullptr;
+    int Data;
+    Node(int InData = 0)
+    {
+        PrevNode = nullptr;
+        NextNode = nullptr;
+        Data = InData;
+    }
+};
+
 class Queue
 {
 private:
-    int * DataList;
-    int FrontIndex;
-    int BackIndex;
-    int Length;
+    Node * HeadNode;
+    Node * TailNode;
+    int ElementCount;
 
 public:
-    Queue(int InLength = 0);
+    Queue();
     ~Queue();
     bool IsEmpty();
     bool PushData(int InData);
@@ -18,66 +30,113 @@ public:
     void PrintData();
 };
 
-Queue::Queue(int InLength)
+Queue::Queue()
 {
-    DataList = new int[InLength];
-    Length = InLength;
-    FrontIndex = 0;
-    BackIndex = 0;
+    HeadNode = nullptr;
+    TailNode = nullptr;
+    ElementCount = 0;
 }
 
 Queue::~Queue()
 {
-    delete [] DataList;
-    DataList = nullptr;
+    if(TailNode)
+    {
+        Node * TempNode = TailNode->PrevNode;
+        while(TempNode)
+        {
+            Node * DeleteNode = TempNode;
+            TempNode = TempNode->PrevNode;
+            delete DeleteNode;
+            DeleteNode = nullptr;
+        }
+
+        delete TailNode;
+        TailNode = nullptr;
+    }
+
+    if(HeadNode)
+    {
+        delete HeadNode;
+        HeadNode = nullptr;
+    }
 }
 
 bool Queue::IsEmpty()
 {
-    return FrontIndex == BackIndex;
+    return ElementCount == 0;
 }
 
 bool Queue::PushData(int InData)
 {
-    if(this->GetSize() >= Length)
+    if(ElementCount == 0)
     {
-        std::cout << "큐가 가득찼습니다." << std::endl;
-        return false;
+        HeadNode = new Node(InData);
+        TailNode = HeadNode;
+        
+    }
+    else
+    {
+        Node * TempNode = HeadNode;
+        while(TempNode->NextNode)
+        {
+            TempNode = TempNode->NextNode;
+        }
+        Node * NewNode = new Node(InData);
+        TempNode->NextNode = NewNode;
+        NewNode->PrevNode = TempNode;
+        this->TailNode = NewNode;
     }
 
-    DataList[BackIndex] = InData;
-    BackIndex += 1;
+    ElementCount++;
+
     return true;
 }
 
 int Queue::PopData()
 {
-    if(this->GetSize() == 0)
+    if(ElementCount == 0)
     {
         std::cout << "큐에 데이터가 없습니다." << std::endl;
+        return -1;
     }
 
-    int OutData = DataList[FrontIndex];
-    FrontIndex += 1;
-    return OutData;
+    int Data = 0;
+    Node * TempNode = HeadNode->NextNode;
+    Data = HeadNode->Data;
+    TempNode->PrevNode = nullptr;
+    delete HeadNode;
+    HeadNode = nullptr;
+    HeadNode = TempNode;
+    ElementCount--;
+
+    return Data;
 }
 
 int Queue::GetSize()
 {
-    return BackIndex - FrontIndex;
+    return ElementCount;
 }
 
 void Queue::PrintData()
 {
-    for(int i=0; i< this->GetSize(); ++i)
+    if(ElementCount == 0)
     {
-        std::cout << i << "번째 데이터 : " << DataList[i] << std::endl;
+        std::cout << "출력할 데이터가 없습니다." << std::endl;
+    }
+
+    int Count = 0;
+    Node * TempNode = HeadNode;
+    while(TempNode)
+    {
+        std::cout << Count + 1 << "번째 데이터 : " << TempNode->Data << std::endl; 
+        TempNode = TempNode->NextNode;
+        Count++;
     }
 }
 
 int main(){
     
-    Queue QueueList(10);
+    Queue QueueList;
 
     std::cout << "큐의 현재 사이즈 :" << QueueList.GetSize() << std::endl; 
 
@@ -88,10 +147,10 @@ int main(){
 
     QueueList.PrintData();
     std::cout << "큐의 현재 사이즈 :" << QueueList.GetSize() << std::endl; 
-
+    
     for(int j=0; j<5; ++j)
     {
-        QueueList.PopData();
+        std::cout << "데이터 : " << QueueList.PopData() << " 팝업" << std::endl;
     }
 
     QueueList.PrintData();
