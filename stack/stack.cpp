@@ -1,14 +1,27 @@
 #include <iostream>
 
+struct Node
+{
+    Node * PrevNode;
+    Node * NextNode;
+    int Data;
+    Node(int InData = 0)
+    {
+        PrevNode = nullptr;
+        NextNode = nullptr;
+        Data = InData;
+    }
+};
+
 class Stack
 {
     private:
-        int * DataList;
-        int CurrentIndex;
-        int Length;
+        Node * HeadNode;
+        Node * TailNode;
+        int ElementCount;
 
     public:
-        Stack(int InLength = 0);
+        Stack();
         ~Stack();
         bool IsEmpty();
         int GetSize();
@@ -17,66 +30,101 @@ class Stack
         void PrintData();
 };
 
-Stack::Stack(int InLength)
+Stack::Stack()
 {
-    DataList = new int[InLength];
-    Length = InLength;
-    CurrentIndex = 0;
+    HeadNode = nullptr;
+    TailNode = nullptr;
+    ElementCount = 0;
 }
 
 Stack::~Stack()
 {
-    delete [] DataList;
-    DataList = nullptr;
+    if(TailNode)
+    {
+        Node * TempNode = TailNode->PrevNode;
+        while(TempNode)
+        {
+            Node * DeleteNode = TempNode;
+            TempNode = TempNode->PrevNode;
+            delete DeleteNode;
+            DeleteNode = nullptr;
+            ElementCount--;
+        }
+        
+        delete TailNode;
+        TailNode = nullptr;
+    }
+
+    if(HeadNode)
+    {
+        delete HeadNode;
+        HeadNode = nullptr;
+    }
 }
 
 bool Stack::IsEmpty()
 {
-    return CurrentIndex == 0;
+    return ElementCount == 0;
 }
 
 int Stack::GetSize()
 {
-    return CurrentIndex;
+    return ElementCount;
 }
 
 bool Stack::PushData(int InData)
 {
-    if(this->GetSize() >= Length)
+    if(ElementCount == 0)
     {
-        std::cout << "스택이 가득 찼습니다." << std::endl;
-        return false;
+        HeadNode = new Node(InData);
+        TailNode = HeadNode;
+    }
+    else
+    {
+        Node * NewNode = new Node(InData);
+        this->TailNode->NextNode = NewNode;
+        NewNode->PrevNode = this->TailNode;
+        this->TailNode = NewNode;
     }
 
-    DataList[CurrentIndex] = InData;
-    CurrentIndex += 1;
+    ElementCount++;
+
     return true;
 }
 
 int Stack::PopData()
 {
-    if(this->GetSize() == 0)
+    if(ElementCount == 0)
     {
-        std::cout << "데이터가 없습니다." << std::endl;
+        std::cout << "스택에 데이터가 없습니다." << std::endl;
         return -1;
     }
 
-    CurrentIndex -= 1;
-    int OutData = DataList[CurrentIndex];
-    return OutData;
+    int Data = this->TailNode->Data;
+    Node * DeleteNode = this->TailNode;
+    DeleteNode->PrevNode->NextNode = nullptr;
+    this->TailNode = DeleteNode->PrevNode;
+    delete DeleteNode;
+    DeleteNode = nullptr;
+    ElementCount--;
+
+    return Data;
 }
 
 void Stack::PrintData()
 {
-    for(int i=0; i<this->GetSize(); ++i)
+    int Count = 0;
+    Node * TempNode = HeadNode;
+    while(TempNode)
     {
-        std::cout << i << "번째 데이터 : " << DataList[i] << std::endl;
+        std::cout << Count + 1 << "번째 데이터 : " << TempNode->Data << std::endl;
+        TempNode = TempNode->NextNode;
     }
 }
 
 int main()
 {
-    Stack StackList(10);
+    Stack StackList;
 
     std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
     for(int i=0; i<15; ++i)
@@ -86,12 +134,14 @@ int main()
 
     StackList.PrintData();
     std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
-
+    
+    
     for(int j=0; j<3; ++j)
     {
-        StackList.PopData();
+        std::cout << StackList.PopData() << " 데이터 팝업" << std::endl;
     }
 
     StackList.PrintData();
     std::cout << "스택 사이즈 : " << StackList.GetSize() << std::endl;
+    
 }

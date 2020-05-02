@@ -76,14 +76,9 @@ bool Queue::PushData(int InData)
     }
     else
     {
-        Node * TempNode = HeadNode;
-        while(TempNode->NextNode)
-        {
-            TempNode = TempNode->NextNode;
-        }
         Node * NewNode = new Node(InData);
-        TempNode->NextNode = NewNode;
-        NewNode->PrevNode = TempNode;
+        this->TailNode->NextNode = NewNode;
+        NewNode->PrevNode = this->TailNode;
         this->TailNode = NewNode;
     }
 
