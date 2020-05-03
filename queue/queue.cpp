@@ -13,6 +13,15 @@ struct Node
     }
 };
 
+void SafeDelete(Node * InNode)
+{
+    if(InNode)
+    {
+        delete InNode;
+        InNode = nullptr;
+    }
+}
+
 class Queue
 {
 private:
@@ -46,19 +55,13 @@ Queue::~Queue()
         {
             Node * DeleteNode = TempNode;
             TempNode = TempNode->PrevNode;
-            delete DeleteNode;
-            DeleteNode = nullptr;
+            SafeDelete(DeleteNode);
         }
 
-        delete TailNode;
-        TailNode = nullptr;
+        SafeDelete(TailNode);
     }
 
-    if(HeadNode)
-    {
-        delete HeadNode;
-        HeadNode = nullptr;
-    }
+    SafeDelete(HeadNode);
 }
 
 bool Queue::IsEmpty()
@@ -99,8 +102,7 @@ int Queue::PopData()
     Node * TempNode = HeadNode->NextNode;
     Data = HeadNode->Data;
     TempNode->PrevNode = nullptr;
-    delete HeadNode;
-    HeadNode = nullptr;
+    SafeDelete(HeadNode);
     HeadNode = TempNode;
     ElementCount--;
 

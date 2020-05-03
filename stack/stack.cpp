@@ -13,6 +13,15 @@ struct Node
     }
 };
 
+void SafeDelete(Node * InNode)
+{
+    if(InNode)
+    {
+        delete InNode;
+        InNode = nullptr;
+    }
+}
+
 class Stack
 {
     private:
@@ -46,20 +55,14 @@ Stack::~Stack()
         {
             Node * DeleteNode = TempNode;
             TempNode = TempNode->PrevNode;
-            delete DeleteNode;
-            DeleteNode = nullptr;
+            SafeDelete(DeleteNode);
             ElementCount--;
         }
-        
-        delete TailNode;
-        TailNode = nullptr;
+       
+        SafeDelete(TailNode);
     }
 
-    if(HeadNode)
-    {
-        delete HeadNode;
-        HeadNode = nullptr;
-    }
+    SafeDelete(HeadNode);
 }
 
 bool Stack::IsEmpty()
@@ -104,8 +107,7 @@ int Stack::PopData()
     Node * DeleteNode = this->TailNode;
     DeleteNode->PrevNode->NextNode = nullptr;
     this->TailNode = DeleteNode->PrevNode;
-    delete DeleteNode;
-    DeleteNode = nullptr;
+    SafeDelete(DeleteNode);
     ElementCount--;
 
     return Data;

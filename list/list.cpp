@@ -13,6 +13,15 @@ struct Node
     }
 };
 
+void SafeDelete(Node * InNode)
+{
+    if(InNode)
+    {
+        delete InNode;
+        InNode = nullptr;
+    }
+}
+
 class LinkedList
 {
     private:
@@ -43,10 +52,8 @@ LinkedList::~LinkedList()
 {
     if(ElementCount == 0)
     {
-        delete HeadNode;
-        HeadNode = nullptr;
-        delete TailNode;
-        TailNode = nullptr;
+        SafeDelete(HeadNode);
+        SafeDelete(TailNode);
     }
     else
     {
@@ -55,12 +62,10 @@ LinkedList::~LinkedList()
         {
             Node * DeleteNode = TempNode;
             TempNode = TempNode->PrevNode;
-            delete DeleteNode;
-            DeleteNode = nullptr;
+            SafeDelete(DeleteNode);
         }   
 
-        delete TailNode;
-        TailNode = nullptr;
+        SafeDelete(TailNode);
     }
 }
 
@@ -151,8 +156,7 @@ bool LinkedList::DeleteData(int InData)
         if(TempNode->Data == InData)
         {
             HeadNode = HeadNode->NextNode;
-            delete TempNode;
-            TempNode = nullptr;
+            SafeDelete(TempNode);
             ElementCount -= 1;
             if(ElementCount == 1)   TailNode = HeadNode;
             std::cout << InData << " 데이터 삭제 완료" << std::endl;
@@ -166,8 +170,7 @@ bool LinkedList::DeleteData(int InData)
             {
                 TempNode->PrevNode->NextNode = TempNode->NextNode;
                 TempNode->NextNode->PrevNode = TempNode->PrevNode;
-                delete TempNode;
-                TempNode = nullptr;
+                SafeDelete(TempNode);
                 ElementCount -= 1;
                 std::cout << InData << " 데이터 삭제 완료" << std::endl;
                 return true;
