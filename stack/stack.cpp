@@ -80,8 +80,11 @@ bool Stack::PushData(int InData)
     if(HeadNode == nullptr)
     {
         Node * PushNode = new Node(InData);
-        HeadNode = PushNode;
-        TailNode = HeadNode;
+        this->HeadNode = PushNode;
+        this->TailNode = this->HeadNode;
+
+        this->HeadNode->PrevNode = this->TailNode;
+        this->TailNode->NextNode = this->HeadNode;
     }
     else
     {
@@ -90,6 +93,9 @@ bool Stack::PushData(int InData)
         TempNode->NextNode = PushNode;
         PushNode->PrevNode = TempNode;
         this->TailNode = PushNode;
+
+        this->TailNode->NextNode = this->HeadNode;
+        this->HeadNode->PrevNode = this->TailNode;
     }
 
     ElementCount++;
@@ -108,8 +114,9 @@ int Stack::PopData()
     int Data = 0;
     Node * PopNode = this->TailNode;
     Data = PopNode->Data;
-    PopNode->PrevNode->NextNode = nullptr;
     this->TailNode = PopNode->PrevNode;
+    this->TailNode->NextNode = this->HeadNode;
+    this->HeadNode->PrevNode = this->TailNode;
     SafeDelete(PopNode); 
     ElementCount--;
 
@@ -119,12 +126,12 @@ int Stack::PopData()
 void Stack::PrintData()
 {
     int Count = 0;
-    Node * TempNode = HeadNode;
-    while(TempNode)
+    Node * TempNode = this->HeadNode;
+    do
     {
         std::cout << Count + 1 << "번째 데이터 : " << TempNode->Data << std::endl;
         TempNode = TempNode->NextNode;
-    }
+    }while(TempNode != this->HeadNode);
 }
 
 int main()
