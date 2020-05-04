@@ -59,10 +59,10 @@ Stack::~Stack()
             ElementCount--;
         }
        
-        SafeDelete(TailNode);
+        TailNode = nullptr;
     }
 
-    SafeDelete(HeadNode);
+    HeadNode = nullptr;
 }
 
 bool Stack::IsEmpty()
@@ -77,17 +77,19 @@ int Stack::GetSize()
 
 bool Stack::PushData(int InData)
 {
-    if(ElementCount == 0)
+    if(HeadNode == nullptr)
     {
-        HeadNode = new Node(InData);
+        Node * PushNode = new Node(InData);
+        HeadNode = PushNode;
         TailNode = HeadNode;
     }
     else
     {
-        Node * NewNode = new Node(InData);
-        this->TailNode->NextNode = NewNode;
-        NewNode->PrevNode = this->TailNode;
-        this->TailNode = NewNode;
+        Node * PushNode = new Node(InData);
+        Node * TempNode = this->TailNode;
+        TempNode->NextNode = PushNode;
+        PushNode->PrevNode = TempNode;
+        this->TailNode = PushNode;
     }
 
     ElementCount++;
@@ -103,11 +105,12 @@ int Stack::PopData()
         return -1;
     }
 
-    int Data = this->TailNode->Data;
-    Node * DeleteNode = this->TailNode;
-    DeleteNode->PrevNode->NextNode = nullptr;
-    this->TailNode = DeleteNode->PrevNode;
-    SafeDelete(DeleteNode);
+    int Data = 0;
+    Node * PopNode = this->TailNode;
+    Data = PopNode->Data;
+    PopNode->PrevNode->NextNode = nullptr;
+    this->TailNode = PopNode->PrevNode;
+    SafeDelete(PopNode); 
     ElementCount--;
 
     return Data;

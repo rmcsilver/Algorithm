@@ -50,12 +50,7 @@ LinkedList::LinkedList()
 
 LinkedList::~LinkedList()
 {
-    if(ElementCount == 0)
-    {
-        SafeDelete(HeadNode);
-        SafeDelete(TailNode);
-    }
-    else
+    if(TailNode)
     {
         Node * TempNode = TailNode->PrevNode;
         while(TempNode)
@@ -64,9 +59,10 @@ LinkedList::~LinkedList()
             TempNode = TempNode->PrevNode;
             SafeDelete(DeleteNode);
         }   
-
-        SafeDelete(TailNode);
+        TailNode = nullptr;
     }
+
+    HeadNode = nullptr;
 }
 
 int LinkedList::GetSize()
@@ -78,7 +74,7 @@ void LinkedList::PrintList()
 {
     int CurrentIndex = 0;
     Node* TempNode = HeadNode;
-    while (TempNode != nullptr)
+    while (TempNode)
     {
         CurrentIndex += 1;
         std::cout << CurrentIndex << "번째 데이터 : " << TempNode->Data << std::endl;
@@ -90,28 +86,21 @@ void LinkedList::InsertData(int InData)
 {
     if(HeadNode == nullptr)
     {
-        HeadNode = new Node(InData);
+        Node * InsertNode = new Node(InData);
+        HeadNode = InsertNode;
         TailNode = HeadNode;
-        ElementCount += 1;
-        std::cout << "head 에 " << InData << "삽입" << std::endl;
     }
     else
     {
-        Node * TempNode = HeadNode;
-        while(TempNode->NextNode)
-        {
-            TempNode = TempNode->NextNode;
-        }
-
-        Node * NewNode = new Node(InData);
-        NewNode->PrevNode = TempNode;
-        TempNode->NextNode = NewNode;
-        this->TailNode = NewNode;
-                
-        ElementCount += 1;
-        std::cout << "next에 " << InData << " 삽입" << std::endl;
-        return;
+        Node * InsertNode = new Node(InData);
+        
+        Node * TempNode = this->TailNode;
+        TempNode->NextNode = InsertNode;
+        InsertNode->PrevNode = TempNode;
+        this->TailNode = InsertNode;
     }
+
+    ElementCount++;
 }
   
 bool LinkedList::InsertBefore(int InData, int InBeforeData)
@@ -136,10 +125,9 @@ bool LinkedList::InsertBefore(int InData, int InBeforeData)
         NewNode->PrevNode = TempPrevNode;
         NewNode->NextNode = TempNode;
         TempNode->PrevNode = NewNode;
-        ElementCount += 1;
-        std::cout << InBeforeData << " 데이터 앞에 " << InData << " 데이터 삽입" << std::endl;
     }
 
+    ElementCount++;
     return true;
 }
    
@@ -152,31 +140,46 @@ bool LinkedList::DeleteData(int InData)
     }
     else
     {
-        Node * TempNode = HeadNode;
-        if(TempNode->Data == InData)
+        if(HeadNode == TailNode)
         {
-            HeadNode = HeadNode->NextNode;
-            SafeDelete(TempNode);
-            ElementCount -= 1;
-            if(ElementCount == 1)   TailNode = HeadNode;
-            std::cout << InData << " 데이터 삭제 완료" << std::endl;
-            return true;
-        }
-
-        TempNode = TempNode->NextNode;
-        while(TempNode)
-        {
+            Node * TempNode = HeadNode;
             if(TempNode->Data == InData)
             {
-                TempNode->PrevNode->NextNode = TempNode->NextNode;
-                TempNode->NextNode->PrevNode = TempNode->PrevNode;
                 SafeDelete(TempNode);
-                ElementCount -= 1;
-                std::cout << InData << " 데이터 삭제 완료" << std::endl;
+                HeadNode = nullptr;
+                TailNode = nullptr;
+                ElementCount--;
                 return true;
             }
-            
-            TempNode = TempNode->NextNode;
+        }
+        else
+        {
+            Node * TempNode = HeadNode;
+            if(TempNode->Data == InData)
+            {
+                HeadNode = TempNode->NextNode;
+                TempNode->PrevNode = nullptr;
+                SafeDelete(TempNode);
+                ElementCount--;
+                return true;
+            }
+
+            while(TempNode)
+            {
+                if(TempNode->Data == InData)
+                {
+                    TempNode->PrevNode->NextNode = TempNode->NextNode;
+                    TempNode->NextNode->PrevNode = TempNode->PrevNode;
+                    if(TempNode->NextNode->NextNode == nullptr)
+                    {
+                        TailNode = TempNode->NextNode;
+                    }
+                    SafeDelete(TempNode);
+                    ElementCount--;
+                    return true;    
+                }
+                TempNode = TempNode->NextNode;
+            }
         }
     }
 

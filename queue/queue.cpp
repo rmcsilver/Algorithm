@@ -58,10 +58,10 @@ Queue::~Queue()
             SafeDelete(DeleteNode);
         }
 
-        SafeDelete(TailNode);
+        TailNode = nullptr;
     }
 
-    SafeDelete(HeadNode);
+    HeadNode = nullptr;
 }
 
 bool Queue::IsEmpty()
@@ -71,18 +71,19 @@ bool Queue::IsEmpty()
 
 bool Queue::PushData(int InData)
 {
-    if(ElementCount == 0)
+    if(HeadNode == nullptr)
     {
-        HeadNode = new Node(InData);
+        Node * PushNode = new Node(InData);
+        HeadNode = PushNode;
         TailNode = HeadNode;
-        
     }
     else
     {
-        Node * NewNode = new Node(InData);
-        this->TailNode->NextNode = NewNode;
-        NewNode->PrevNode = this->TailNode;
-        this->TailNode = NewNode;
+        Node * PushNode = new Node(InData);
+        Node * TempNode = this->HeadNode;
+        TempNode->PrevNode = PushNode;
+        PushNode->NextNode = TempNode;
+        this->HeadNode = PushNode;
     }
 
     ElementCount++;
@@ -99,11 +100,11 @@ int Queue::PopData()
     }
 
     int Data = 0;
-    Node * TempNode = HeadNode->NextNode;
-    Data = HeadNode->Data;
-    TempNode->PrevNode = nullptr;
-    SafeDelete(HeadNode);
-    HeadNode = TempNode;
+    Node * PopNode = HeadNode;
+    Data = PopNode->Data;
+    PopNode->NextNode->PrevNode = nullptr;
+    HeadNode = PopNode->NextNode;
+    SafeDelete(PopNode);
     ElementCount--;
 
     return Data;
@@ -122,7 +123,7 @@ void Queue::PrintData()
     }
 
     int Count = 0;
-    Node * TempNode = HeadNode;
+    Node * TempNode = this->HeadNode;
     while(TempNode)
     {
         std::cout << Count + 1 << "번째 데이터 : " << TempNode->Data << std::endl; 
