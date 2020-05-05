@@ -1,40 +1,82 @@
 #! /usr/bin/python
 # -*- coding:utf-8 -*-
 
-# 4. 파이썬 리스트 기능에서 제공하는 메서드로 스택 사용해보기
 
-data_stack = list()
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.prevNode = None
+        self.nextNode = None
 
-data_stack.append(1)
-data_stack.append(2)
+class Stack:
+    def __init__(self):
+        self.headNode = None
+        self.tailNode = None
+        self.elementCount = 0
 
-print(data_stack)
+    def GetSize(self):
+        return self.elementCount
 
-print(data_stack.pop())
+    def PrintData(self):
+        if self.headNode is None:
+            print("출력할 데이터가 없습니다.")
+            return
+
+        count = 0
+        currentNode = self.headNode
+        while currentNode:
+            count += 1
+            print(count, '번째 데이터 : ', currentNode.data)
+            currentNode = currentNode.nextNode
+            if currentNode == self.headNode:
+                return
+
+    def Append(self, data):
+        appendNode = Node(data)
+        if self.headNode is None:
+            self.headNode = appendNode
+            self.tailNode = self.headNode
+        else:
+            currentNode = self.tailNode
+            currentNode.nextNode = appendNode
+            appendNode.prevNode = currentNode
+            self.tailNode = appendNode
+        self.tailNode.nextNode = self.headNode
+        self.headNode.prevNode = self.tailNode
+        self.elementCount += 1
+
+    def Pop(self):
+        if self.headNode is None:
+            print("데이터가 없습니다. pop실패")
+            return
+        popNode = self.tailNode
+        data = popNode.data
+        self.tailNode = popNode.prevNode
+        self.tailNode.nextNode = self.headNode
+        self.headNode.prevNode = self.tailNode
+        popNode = None
+        self.elementCount -= 1
+        return data
 
 
-# 5. 프로그래밍 연습
-# 연습1: 리스트 변수로 스택을 다루는 pop, push 기능 구현해보기
-# (pop, push 함수 사용하지 않고 직접 구현해보기)
+if __name__ == '__main__':
+    stack = Stack()
+    stack.PrintData()
+    print('스택 사이즈 : ', stack.GetSize())
 
-stack = list()
+    stack.Append(100)
+    stack.PrintData()
+    print('스택 사이즈 : ', stack.GetSize())
+
+    for i in range(1, 10):
+        stack.Append(i)
+    stack.PrintData()
+    print('스택 사이즈 : ', stack.GetSize())
+
+    print('Pop 데이터 : ', stack.Pop())
+    print('Pop 데이터 : ', stack.Pop())
+    stack.PrintData()
+    print('스택 사이즈 : ', stack.GetSize())
 
 
-def push(data):
-    stack.append(data)
-    print(data, ' -> push')
 
-
-def pop():
-    # data = stack[len(stack)-1]
-    # del stack[len(stack)-1]
-    data = stack[-1]
-    del stack[-1]
-    print(data, ' -> pop')
-    return data
-
-
-for index in range(10):
-    push(index)
-
-pop()
