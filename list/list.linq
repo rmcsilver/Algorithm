@@ -109,38 +109,37 @@ public class LinkedList
 			return false;
 		}
 		
-		Node CurrentNode = headNode;
-		if(CurrentNode == tailNode)
+		Node deleteNode = headNode;
+		if(deleteNode == tailNode && deleteNode.data == data)
 		{
-			CurrentNode = null;
+			deleteNode = null;
 			headNode = null;
 			tailNode = null;
 			elementCount--;
 			return true;
 		}
 		
-		while(CurrentNode != null)
+		while(deleteNode != null)
 		{
-			if(CurrentNode.data == data)
+			if(deleteNode.data == data)
 			{
-				Node DeleteNode = CurrentNode;
-				if(CurrentNode != tailNode)
+				if(deleteNode != tailNode)
 				{
-					DeleteNode.prevNode.nextNode = DeleteNode.nextNode;
-					DeleteNode.nextNode.prevNode = DeleteNode.prevNode;
+					deleteNode.prevNode.nextNode = deleteNode.nextNode;
+					deleteNode.nextNode.prevNode = deleteNode.prevNode;
 				}
 				else
 				{
-					tailNode = DeleteNode.prevNode;
+					tailNode = deleteNode.prevNode;
 					headNode.prevNode = tailNode;
 					tailNode.nextNode = headNode;
 				}
 				
-				DeleteNode = null;
+				deleteNode = null;
 				
 				return true;
 			}
-			CurrentNode = CurrentNode.nextNode;
+			deleteNode = deleteNode.nextNode;
 		}
 		
 		Console.WriteLine("데이터를 찾을 수 없습니다. 삭제실패.");
