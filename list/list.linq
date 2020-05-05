@@ -118,20 +118,18 @@ public class LinkedList
 		{
 			if(deleteNode == tailNode)
 			{
-				deleteNode = null;
 				headNode = null;
 				tailNode = null;
-				elementCount--;
-				return true;
 			}
 			else
 			{
 				headNode = deleteNode.nextNode;
 				headNode.prevNode = tailNode;
 				tailNode.nextNode = headNode;
-				deleteNode = null;
-				elementCount--;
 			}
+			deleteNode = null;
+			elementCount--;
+			return true;
 		}
 		
 		while(deleteNode != null)
