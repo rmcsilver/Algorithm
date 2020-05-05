@@ -9,9 +9,11 @@ void Main()
 	
 	list.InsertData(10);
 	list.PrintList();
+	Console.WriteLine("리스트 사이즈 : " + list.GetSize());
 	
 	list.DeleteData(10);
 	list.PrintList();
+	Console.WriteLine("리스트 사이즈 : " + list.GetSize());
 	
 	for(int i=0; i<10; ++i)
 	{
@@ -23,6 +25,8 @@ void Main()
 	
 	list.DeleteData(5);
 	list.PrintList();
+	Console.WriteLine("리스트 사이즈 : " + list.GetSize());
+
 }
 
 // Define other methods, classes and namespaces here
@@ -110,13 +114,24 @@ public class LinkedList
 		}
 		
 		Node deleteNode = headNode;
-		if(deleteNode == tailNode && deleteNode.data == data)
+		if(deleteNode.data == data)
 		{
-			deleteNode = null;
-			headNode = null;
-			tailNode = null;
-			elementCount--;
-			return true;
+			if(deleteNode == tailNode)
+			{
+				deleteNode = null;
+				headNode = null;
+				tailNode = null;
+				elementCount--;
+				return true;
+			}
+			else
+			{
+				headNode = deleteNode.nextNode;
+				headNode.prevNode = tailNode;
+				tailNode.nextNode = headNode;
+				deleteNode = null;
+				elementCount--;
+			}
 		}
 		
 		while(deleteNode != null)
@@ -136,7 +151,7 @@ public class LinkedList
 				}
 				
 				deleteNode = null;
-				
+				elementCount--;
 				return true;
 			}
 			deleteNode = deleteNode.nextNode;
