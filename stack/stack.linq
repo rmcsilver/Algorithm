@@ -2,27 +2,27 @@
 
 void Main()
 {
-	var queue = new Queue();
+	Stack stack = new Stack();
+	Console.WriteLine("현재 스택의 사이즈 : " + stack.GetSize());
+	stack.PrintData();
 
-	queue.PrintData();
+	stack.PushData(10);
+	stack.PrintData();
+	Console.WriteLine("현재 스택의 사이즈 : " + stack.GetSize());
 
-	queue.PushData(10);
-	queue.PrintData();
-	Console.WriteLine("현재 큐의 사이즈 : " + queue.GetSize());
-
-	for (int i = 0; i < 10; ++i)
+	for(var i=0; i<10; ++i)
 	{
-		queue.PushData(i);
+		stack.PushData(i);
 	}
+	stack.PrintData();
+	Console.WriteLine("현재 스택의 사이즈 : " + stack.GetSize());
 
-	queue.PrintData();
-	Console.WriteLine("현재 큐의 사이즈 : " + queue.GetSize());
+	Console.WriteLine(stack.PopData() + " : 데이터 팝업");
+	Console.WriteLine(stack.PopData() + " : 데이터 팝업");
+	stack.PrintData();
+	Console.WriteLine("현재 스택의 사이즈 : " + stack.GetSize());
 
-	queue.PopData();
-	queue.PopData();
 
-	queue.PrintData();
-	Console.WriteLine("현재 큐의 사이즈 : " + queue.GetSize());
 }
 
 // Define other methods, classes and namespaces here
@@ -40,13 +40,13 @@ public class Node
 	}
 }
 
-public class Queue
+public class Stack
 {
 	public Node headNode;
 	public Node tailNode;
 	public int elementCount;
 	
-	public Queue()
+	public Stack()
 	{
 		headNode = null;
 		tailNode = null;
@@ -71,12 +71,12 @@ public class Queue
 			return;
 		}
 		
-		int Count = 0;
+		int count = 0;
 		Node currentNode = headNode;
 		do
 		{
-			Count++;
-			Console.WriteLine(Count + "번째 데이터 : " + currentNode.data);
+			count++;
+			Console.WriteLine(count + "번째 데이터 : " + currentNode.data);
 			currentNode = currentNode.nextNode;
 		}while(currentNode != headNode);
 	}
@@ -84,22 +84,23 @@ public class Queue
 	public void PushData(int InData)
 	{
 		Node pushNode = new Node(InData);
-		
 		if(headNode == null)
 		{
 			headNode = pushNode;
 			tailNode = headNode;
+			headNode.prevNode = tailNode;
+			tailNode.nextNode = headNode;
 		}
 		else
 		{
-			Node currentNode = headNode;
-			currentNode.prevNode = pushNode;
-			pushNode.nextNode = currentNode;
-			headNode = pushNode;
+			Node currentNode = tailNode;
+			currentNode.nextNode = pushNode;
+			pushNode.prevNode = currentNode;
+			tailNode = pushNode;
+			tailNode.nextNode = headNode;
+			headNode.prevNode = tailNode;
 		}
 		
-		headNode.prevNode = tailNode;
-		tailNode.nextNode = headNode;
 		elementCount++;
 	}
 	
@@ -127,7 +128,7 @@ public class Queue
 			popNode = null;
 		}
 		
-		elementCount--;
+		elementCount--;	
 		return data;
 	}
 }

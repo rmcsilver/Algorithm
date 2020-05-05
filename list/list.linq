@@ -2,7 +2,7 @@
 
 void Main()
 {
-	LinkedList list = new LinkedList();
+	var list = new LinkedList();
 	
 	Console.WriteLine(list.GetSize());
 	list.PrintList();
@@ -29,118 +29,118 @@ void Main()
 
 public class Node
 {
-	public int _data;
-	public Node _prevNode;
-	public Node _nextNode;
+	public int data;
+	public Node prevNode;
+	public Node nextNode;
 	
-	public Node(int data=0)
+	public Node(int InData=0)
 	{
-		_data = data;
-		_prevNode = null;
-		_nextNode = null;
+		data = InData;
+		prevNode = null;
+		nextNode = null;
 	}
 }
 
 public class LinkedList
 {
-	public Node HeadNode;
-	public Node TailNode;
-	public int ElementCount;
+	public Node headNode;
+	public Node tailNode;
+	public int elementCount;
 	
 	public LinkedList()
 	{
-		HeadNode = null;
-		TailNode = null;
-		ElementCount = 0;
+		headNode = null;
+		tailNode = null;
+		elementCount = 0;
 	}
 	
 	public int GetSize()
 	{
-		return ElementCount;
+		return elementCount;
 	}
 	
 	public void PrintList()
 	{
-		if(HeadNode == null)
+		if(headNode == null)
 		{
 			Console.WriteLine("출력할 데이터가 없습니다.");
 			return;
 		}
 		
 		int Count = 0;
-		Node CurrentNode = HeadNode;
+		Node currentNode = headNode;
 		do
 		{
-			Console.WriteLine(Count + 1 + "번째 데이터 : " + CurrentNode._data);
-			CurrentNode = CurrentNode._nextNode;
+			Console.WriteLine(Count + 1 + "번째 데이터 : " + currentNode.data);
+			currentNode = currentNode.nextNode;
 			Count++;
-		}while(CurrentNode != HeadNode);
+		}while(currentNode != headNode);
 	}
 	
-	public void InsertData(int data)
+	public void InsertData(int InData)
 	{
-		if(HeadNode == null)
+		if(headNode == null)
 		{
-			Node InsertNode = new Node(data);
-			HeadNode = InsertNode;
-			TailNode = HeadNode;
-			HeadNode._prevNode = TailNode;
-			TailNode._nextNode = HeadNode;
-			ElementCount++;
+			Node insertNode = new Node(InData);
+			headNode = insertNode;
+			tailNode = headNode;
+			headNode.prevNode = tailNode;
+			tailNode.nextNode = headNode;
+			elementCount++;
 		}
 		else
 		{
-			Node InsertNode = new Node(data);
-			Node CurrentNode = TailNode;
-			CurrentNode._nextNode = InsertNode;
-			InsertNode._prevNode = CurrentNode;
-			TailNode = InsertNode;		
-			HeadNode._prevNode = TailNode;
-			TailNode._nextNode = HeadNode;
-			ElementCount++;
+			Node insertNode = new Node(InData);
+			Node currentNode = tailNode;
+			currentNode.nextNode = insertNode;
+			insertNode.prevNode = currentNode;
+			tailNode = insertNode;		
+			headNode.prevNode = tailNode;
+			tailNode.nextNode = headNode;
+			elementCount++;
 		}
 	}
 	
 	public bool DeleteData(int data)
 	{
-		if(HeadNode == null)
+		if(headNode == null)
 		{
 			Console.WriteLine("삭제할 데이터가 없습니다.");
 			return false;
 		}
 		
-		Node CurrentNode = HeadNode;
-		if(CurrentNode == TailNode)
+		Node CurrentNode = headNode;
+		if(CurrentNode == tailNode)
 		{
 			CurrentNode = null;
-			HeadNode = null;
-			TailNode = null;
-			ElementCount--;
+			headNode = null;
+			tailNode = null;
+			elementCount--;
 			return true;
 		}
 		
 		while(CurrentNode != null)
 		{
-			if(CurrentNode._data == data)
+			if(CurrentNode.data == data)
 			{
 				Node DeleteNode = CurrentNode;
-				if(CurrentNode != TailNode)
+				if(CurrentNode != tailNode)
 				{
-					DeleteNode._prevNode._nextNode = DeleteNode._nextNode;
-					DeleteNode._nextNode._prevNode = DeleteNode._prevNode;
+					DeleteNode.prevNode.nextNode = DeleteNode.nextNode;
+					DeleteNode.nextNode.prevNode = DeleteNode.prevNode;
 				}
 				else
 				{
-					TailNode = DeleteNode._prevNode;
-					HeadNode._prevNode = TailNode;
-					TailNode._nextNode = HeadNode;
+					tailNode = DeleteNode.prevNode;
+					headNode.prevNode = tailNode;
+					tailNode.nextNode = headNode;
 				}
 				
 				DeleteNode = null;
 				
 				return true;
 			}
-			CurrentNode = CurrentNode._nextNode;
+			CurrentNode = CurrentNode.nextNode;
 		}
 		
 		Console.WriteLine("데이터를 찾을 수 없습니다. 삭제실패.");
