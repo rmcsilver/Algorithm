@@ -33,12 +33,12 @@ class LinkedList
         LinkedList();
         ~LinkedList();
         int GetSize();
-        void InsertData(int InData);
+        void PrintList();
+        void Push(int InData);
         bool InsertBefore(int InData, int InBeforeData);
         bool DeleteData(int InData);
         Node * SearchData(int InData);
         Node * SearchData_From_Tail(int InData);
-        void PrintList();
 };
 
 LinkedList::LinkedList()
@@ -82,14 +82,13 @@ void LinkedList::PrintList()
     }while(TempNode != this->HeadNode);
 }
 
-void LinkedList::InsertData(int InData)
+void LinkedList::Push(int InData)
 {
     if(HeadNode == nullptr)
     {
         Node * InsertNode = new Node(InData);
         this->HeadNode = InsertNode;
         this->TailNode = this->HeadNode;
-
         this->HeadNode->PrevNode = this->TailNode;
         this->TailNode->NextNode = this->HeadNode;
     }
@@ -259,12 +258,12 @@ int main()
     
     std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
 
-    linkedlist.InsertData(1);
+    linkedlist.Push(1);
     linkedlist.PrintList();
     std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
 
-    linkedlist.InsertData(10);
-    linkedlist.InsertData(20);
+    linkedlist.Push(10);
+    linkedlist.Push(20);
     linkedlist.PrintList();
     std::cout << "링크드리스트 사이즈 : " << linkedlist.GetSize() << std::endl;
 
