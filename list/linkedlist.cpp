@@ -11,7 +11,6 @@
 
 struct Node
 {
-public:
     int Data;
     Node * PrevNode;
     Node * NextNode;
@@ -202,7 +201,7 @@ bool LinkedList::PopFront()
     SafeDelete(PopNode);
 
     ElementCount--;
-    return false;
+    return true;
 }
 
 bool LinkedList::Remove(int InValue)
@@ -212,7 +211,8 @@ bool LinkedList::Remove(int InValue)
         std::cout << "삭제할 데이터가 없습니다." << std::endl;
         return false;
     }
-    
+   
+    bool Result = false;
     Node * CurrentNode = HeadNode;
     while(CurrentNode)
     {
@@ -243,6 +243,7 @@ bool LinkedList::Remove(int InValue)
                 SafeDelete(CurrentNode);
                 CurrentNode = HeadNode;
                 ElementCount--;
+                Result = true;
             }
             else
             {
@@ -252,6 +253,7 @@ bool LinkedList::Remove(int InValue)
                 SafeDelete(CurrentNode);
                 ElementCount--;
                 CurrentNode = TempNode;
+                Result = true;
             }
         }
         else
@@ -260,7 +262,7 @@ bool LinkedList::Remove(int InValue)
         }
     }
 
-    return false;
+    return Result;
 }
 
 bool LinkedList::Erase(int InPosition)
@@ -273,7 +275,7 @@ bool LinkedList::Erase(int InPosition)
 
     if(InPosition > Size())
     {
-        std::cout << "입력값 만큼의 데이터가 없습니다. 현재 리스트 사이즈 : " << Size() << std::endl;
+        std::cout << "입력한 위치에 데이터가 없습니다." << std::endl;
         return false;
     }
 
@@ -359,6 +361,9 @@ int main()
     list->Display();
 
     list->Remove(100);
+    list->Display();
+
+    list->Remove(6);
     list->Display();
 
     list->Erase(5);
