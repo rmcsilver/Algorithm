@@ -5,6 +5,7 @@
  * Author : silver
  * Notes : 
  * Revision : 2020-05-14 Create
+ *            2020-05-15 Chaning Hash Table
  */
 #include <iostream>
 #include <string.h>
@@ -92,7 +93,7 @@ bool LinkedList::PushBack(Node * InElement)
         return false;
     }
 
-    if(HeadNode == TailNode)
+    if(IsEmpty())
     {
         HeadNode = InElement;
         TailNode = HeadNode;
@@ -104,6 +105,7 @@ bool LinkedList::PushBack(Node * InElement)
     {
         Node * CurrentNode = TailNode;
         CurrentNode->NextNode = InElement;
+        InElement->PrevNode = CurrentNode;
         TailNode = InElement;
         HeadNode->PrevNode = TailNode;
         TailNode->NextNode = HeadNode;
@@ -126,6 +128,7 @@ bool LinkedList::PopBack()
         HeadNode = nullptr;
         TailNode = nullptr;
         SafeDelete(CurrentNode);
+        ElementCount--;
     }
     else
     {
@@ -133,6 +136,7 @@ bool LinkedList::PopBack()
         HeadNode->PrevNode = TailNode;
         TailNode->NextNode = HeadNode;
         SafeDelete(CurrentNode);
+        ElementCount--;
     }
 
     return true;
@@ -173,7 +177,8 @@ int GetData(std::string InKey)
 {
     int HashAddress = HashFunction(InKey);
     Node * NewNode = HashTable[HashAddress].GetNode(InKey);
-    return NewNode->Data;
+    if(NewNode != nullptr)  return NewNode->Data;
+    else return -1;
 }
 
 int main()
@@ -194,9 +199,9 @@ int main()
     delete list;
     */
 
-    char Name01[10] = "Andy";
-    char Name02[10] = "Dave";
-    char Name03[10] = "Jones";
+    char Name01[10] = "Da";
+    char Name02[10] = "Db";
+    char Name03[10] = "Dc";
 
     std::cout << HashFunction(Name01) << std::endl;
     std::cout << HashFunction(Name02) << std::endl;
@@ -208,7 +213,7 @@ int main()
 
     std::cout << GetData(Name01) << std::endl;
     std::cout << GetData(Name02) << std::endl;
-
+    std::cout << GetData(Name03) << std::endl;
 
     return 0;
 }
