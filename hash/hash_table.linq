@@ -2,46 +2,29 @@
 
 void Main()
 {
-	int[] reading = new int[6] { 4, 9, 1, 0, 21, 12 };
+	SaveData("Andy", 23456);
+	SaveData("Trump", 12345);
+	SaveData("Suzy", 09876);
 	
-	for(int i=0; i<reading.Length; ++i)
-	{
-		Console.WriteLine(reading[i]);
-	}
-	
-	string data1 = "Andy";
-	string data2 = "Dave";
-	string data3 = "trump";
-	string data4 = "Anthor";
-	
-	Console.WriteLine((int)data1[0]);
-	Console.WriteLine(hash_func( (int)data1[0] ));
-	
-	storage_data("Andy", 12345);
-	storage_data("Dave", 54321);
-	storage_data("Trump", 98765);
-	
-	Console.WriteLine(get_data("ANdy"));
+	Console.WriteLine(GetValue("Andy"));
 }
 
 // Define other methods, classes and namespaces here
-static int[] hash_table = new int[6];
+static int[] HashTable = new int[10];
 
-int hash_func(int InKey)
+int HashFunction(string InKey)
 {
-	return InKey % 6;
+	return (int)(InKey[0]) % 10;
 }
 
-void storage_data(string InData, int InValue)
+void SaveData(string InKey, int InValue)
 {
-	int key = (int)InData[0];
-	int hash_address = hash_func(key);
-	hash_table[hash_address] = InValue;
+	int HashAddress = HashFunction(InKey);
+	HashTable[HashAddress] = InValue;
 }
 
-int get_data(string InData)
+int GetValue(string InKey)
 {
-	int key = (int)InData[0];
-	int hash_address = hash_func(key);
-	return hash_table[hash_address];
+	int HashAddress = HashFunction(InKey);
+	return HashTable[HashAddress];
 }
