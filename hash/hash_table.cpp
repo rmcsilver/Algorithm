@@ -6,214 +6,222 @@
  * Notes : 
  * Revision : 2020-05-14 Create
  *            2020-05-15 Chaning Hash Table
+ *            2020-06-01 Modified 
  */
+
 #include <iostream>
 #include <string.h>
+#include <string>
 
 
-struct Node
+struct data
 {
-    std::string Key;
-    int Data;
-    Node * PrevNode;
-    Node * NextNode;
-    Node(std::string InKey=nullptr, int InData=0)
+    std::string key;
+    std::string value;
+    data(std::string InKey="", std::string InValue="")
     {
-        Key = InKey;
-        Data = InData;
-        PrevNode = nullptr;
-        NextNode = nullptr;
+        key = InKey;
+        value = InValue;
+    }
+    bool IsEmpty()
+    {
+        return (key == "" && value == "")? true: false;  
     }
 };
 
-
-void SafeDelete(Node * InNode)
+void SafeDelete(data * InDataList)
 {
-    if(InNode != nullptr)
+    if(InDataList)
     {
-        delete InNode;
-        InNode = nullptr;
+        delete[] InDataList;
+        InDataList = nullptr;
     }
 }
 
-
-class LinkedList
+class HashTable
 {
 public:
-    LinkedList();
-    ~LinkedList();
-    int Size();
-    bool IsEmpty();
-
-    bool PushBack(Node * InElement);
-    bool PopBack();
-
-    Node * GetNode(std::string InKey);
+    HashTable(int InSize=13);
+    ~HashTable();
+    int hash(std::string InKey);
+    int hash_horner(std::string InKey);
+    int hash_shift(std::string InKey);
+    void add(std::string InKey, std::string InValue);
+    void add_internal(std::string InKey, std::string InValue, data * InTable, int InSize, bool resizing=false);
+    bool resize();
+    int getSize(){return size;}
+    data * getData(int index);
 
 private:
-    Node * HeadNode;
-    Node * TailNode;
-    int ElementCount;
+    int size;
+    data * table;
+    int entry_count;
 };
 
-LinkedList::LinkedList()
+
+HashTable::HashTable(int InSize)
 {
-    HeadNode = nullptr;
-    TailNode = nullptr;
-    ElementCount = 0;
+    size = InSize;
+    table = new data[size];
+    entry_count = 0;
 }
 
-LinkedList::~LinkedList()
+HashTable::~HashTable()
 {
-    for(int i=0; i<ElementCount; ++i) 
-    {
-        PopBack();
-    }
+    SafeDelete(table);
 }
 
-int LinkedList::Size()
+int HashTable::hash(std::string InKey)
 {
-    return ElementCount;
+    int sum = 0;
+    int length = InKey.length();
+    for(int i=0; i<length; ++i)
+    {
+        sum += InKey[i];
+    }
+    return sum % size;
 }
 
-bool LinkedList::IsEmpty()
+int HashTable::hash_horner(std::string InKey)
 {
-    if(HeadNode == nullptr || ElementCount == 0)
+    int sum = 0;
+    int length = InKey.length();
+    int primeNum = 13;
+    for(int i=0; i<length; ++i)
     {
-        return true;
+        sum += sum * primeNum + InKey[i];
     }
-
-    return false;
+    return sum % size;
 }
 
-bool LinkedList::PushBack(Node * InElement)
+int HashTable::hash_shift(std::string InKey)
 {
-    if(InElement == nullptr)
+    int sum = 0;
+    int length = InKey.length();
+    for(int i=0; i<length; ++i)
     {
-        return false;
+        sum += (sum << 4) + InKey[i];
     }
 
-    if(IsEmpty())
-    {
-        HeadNode = InElement;
-        TailNode = HeadNode;
-        HeadNode->PrevNode = TailNode;
-        TailNode->NextNode = HeadNode;
-        ElementCount++;
-    }
-    else
-    {
-        Node * CurrentNode = TailNode;
-        CurrentNode->NextNode = InElement;
-        InElement->PrevNode = CurrentNode;
-        TailNode = InElement;
-        HeadNode->PrevNode = TailNode;
-        TailNode->NextNode = HeadNode;
-        ElementCount++;
-    }
-
-    return true;
+    return sum % size;
 }
 
-bool LinkedList::PopBack()
+void HashTable::add(std::string InKey, std::string InValue)
 {
-    if(IsEmpty())
-    {
-        return false;
-    }
+    add_internal(InKey, InValue, this->table, this->size);
+}
 
-    Node * CurrentNode = TailNode;
-    if(HeadNode == TailNode)
+void HashTable::add_internal(std::string InKey, std::string InValue, data * InTable, int InSize, bool resizing)
+{
+    int index = hash(InKey);
+    if(InTable[index].IsEmpty())
     {
-        HeadNode = nullptr;
-        TailNode = nullptr;
-        SafeDelete(CurrentNode);
-        ElementCount--;
+        InTable[index].key = InKey;
+        InTable[index].value = InValue;
+
+        std::cout << "debug #1 table[" << index << "] key = " << InTable[index].key << std::endl;
     }
     else
     {
-        TailNode = CurrentNode->PrevNode;
-        HeadNode->PrevNode = TailNode;
-        TailNode->NextNode = HeadNode;
-        SafeDelete(CurrentNode);
-        ElementCount--;
+        bool result = false;
+        int attempt_count = 0;
+        while(result == false)
+        {
+            index = (hash_horner(InKey) + attempt_count) % InSize;
+            if(table[index].IsEmpty())
+            {
+                InTable[index].key = InKey;
+                InTable[index].value = InValue;
+                result = true;
+            }
+            else attempt_count++;
+        }
+    
+        std::cout << "debug #2 table[" << index << "] key = " << InTable[index].key << std::endl;
     }
 
-    return true;
-}
 
-Node * LinkedList::GetNode(std::string InKey)
-{
-    if(IsEmpty())
+    if(resizing == false)
     {
-        return nullptr;
+        this->entry_count++;
+
+        //std::cout << "entry_count = " << entry_count << std::endl;
+        //std::cout << "size * 0.7 = " << InSize * 0.7 << std::endl;
+            
+        if(this->entry_count > InSize * 0.7)
+        {
+            std::cout << "resize" << std::endl;
+            resize();
+        }
     }
+    
+}
 
-    Node * CurrentNode = HeadNode;
-    do
+
+bool HashTable::resize()
+{
+    bool result = false;
+    int new_size = 0;
+    new_size = size * 2;
+    data * new_table = new data[new_size];
+    
+    std::cout << std::endl;
+
+    for(int i=0; i<size; ++i)
     {
-        if(CurrentNode->Key == InKey)    return CurrentNode;
-        CurrentNode = CurrentNode->NextNode;
-    }while(CurrentNode != HeadNode);
+        if(table[i].IsEmpty() == false)
+        {
+            add_internal(table[i].key, table[i].value, new_table, new_size, true);
+            std::cout << "debug resize key : " << table[i].key << std::endl;
+        }
 
-    return nullptr;
+    }
+    size = new_size;
+    table = new_table;
+
+    return result;
 }
 
-LinkedList HashTable[10];
-
-int HashFunction(std::string InKey)
+data * HashTable::getData(int index)
 {
-    return (int)(InKey.at(0)) % 10;
+    if(index > size -1) return nullptr;
+
+    return &table[index];
 }
 
-void StorageValue(std::string InKey, int InValue)
+void Print(HashTable * hash)
 {
-    int HashAddress = HashFunction(InKey);
-    Node * NewNode = new Node(InKey, InValue);
-    HashTable[HashAddress].PushBack(NewNode);
+    if(hash != nullptr)
+    {
+        for(int i=0; i<(int)hash->getSize(); ++i)
+        {
+            data * data = hash->getData(i);
+            if(data != nullptr)
+            {
+                std::cout << "[" << i << "]" << data->key;
+                std::cout << ", value = " << data->value << std::endl;
+            }
+        }
+
+        std::cout << std::endl;
+    }
 }
 
-int GetData(std::string InKey)
-{
-    int HashAddress = HashFunction(InKey);
-    Node * NewNode = HashTable[HashAddress].GetNode(InKey);
-    if(NewNode != nullptr)  return NewNode->Data;
-    else return -1;
-}
 
 int main()
 {
-    /*
-    LinkedList * list = new LinkedList();
- 
-    Node * NewNode = new Node("Dave", 1234);
-    list->PushBack(NewNode);
+    HashTable * hash = new HashTable(5);
+    hash->add("Andy", "01Ta0123");
+    Print(hash);
 
-    Node * FindNode = list->GetNode("Dave");
-    if(FindNode != nullptr)
-    {
-        std::cout << FindNode->Key << std::endl;
-        std::cout << FindNode->Data << std::endl;
-    }
+    hash->add("bred", "1004Troy");
+    hash->add("Tom", "andToms666");
+    hash->add("Neyo", "becauseofyou");
+    hash->add("oscar", "mike");
+    
+    Print(hash);
 
-    delete list;
-    */
-
-    char Name01[10] = "Da";
-    char Name02[10] = "Db";
-    char Name03[10] = "Dc";
-
-    std::cout << HashFunction(Name01) << std::endl;
-    std::cout << HashFunction(Name02) << std::endl;
-    std::cout << HashFunction(Name03) << std::endl;
-
-    StorageValue(Name01, 1234);
-    StorageValue(Name02, 4321);
-    StorageValue(Name03, 5678);
-
-    std::cout << GetData(Name01) << std::endl;
-    std::cout << GetData(Name02) << std::endl;
-    std::cout << GetData(Name03) << std::endl;
+    delete hash;
 
     return 0;
 }

@@ -3,110 +3,58 @@
 
 
 class HashTable:
-    def __init__(self, size=10):
+    def __init__(self, size=13):
         self.size = size
-        self.value_array = []
-        self.total_entries = 0
-        for i in range(self.size):
-            self.value_array.append(None)
+        self.table = [None for _ in range(size)]
+        self.entry_count = 0
 
-    def hash1(self, key):
+    def hash(self, key):
+        # print(id(key))
+        # return ord(key) % size
         return id(key) % self.size
 
-    def hash2(self, key):
-        hashval = (id(key) + 501) % self.size
-        return hashval
+    def hash_horner(self, key):
+        prime = 577
+        return (id(key) * prime) % self.size
 
     def add(self, key, value):
-        self.add_internal(key, value, self.value_array, self.size)
+        self.add_internal(key, value, self.table, self.size)
 
-    def add_internal(self, key, value, value_array, size, during_resize=False):
-        if value_array[self.hash1(key)] is None:
-            value_array[self.hash1(key)] = key, value
+    def add_internal(self, key, value, table, size, resizing=False):
+        if table[self.hash(key)] is None:
+            table[self.hash(key)] = key, value
         else:
-            # find the next slot
-            added = False
-            attempt_count = 1
-            while (not added):
-                newhash = \
-                    (self.hash1(key) + attempt_count * self.hash2(key)) % size
-                if value_array[newhash] is None:
-                    value_array[newhash] = key, value
-                    added = True
+            result = False
+            attempt_count = 0
+            while result is False:
+                hash_value = (self.hash_horner(key) + attempt_count) % size
+                if table[hash_value] is None:
+                    table[hash_value] = key, value
+                    result = True
                 else:
                     attempt_count += 1
-        if not during_resize:
-            self.total_entries += 1
-            if self.total_entries > size / 2:
+        if resizing is False:
+            self.entry_count += 1
+            if self.entry_count > size * 0.7:
                 self.resize()
 
-    def get(self, key):
-        got_value = self.value_array[self.hash1(key)]
-        if got_value is None:
-            return None
-        retrieved_key, retrieved_value = got_value
-        if retrieved_key != key:
-            found = False
-            attempt_count = 1
-            while (not found and attempt_count < 50):
-                newhash = (self.hash1(key) + attempt_count * self.hash2(key)) \
-                    % self.size
-                value_at_hash = self.value_array[newhash]
-                if value_at_hash is not None:
-                    retrieved_key, retrieved_value = value_at_hash
-                    if retrieved_key == key:
-                        found = True
-                    attempt_count += 1
-                else:
-                    attempt_count += 1
-        return retrieved_value
-
     def resize(self):
-        new_value_array = []
-        new_size = 2 * self.size
-        for i in range(self.size*2):
-            new_value_array.append(None)
+        new_size = self.size * 2
+        new_table = [None for _ in range(new_size)]
         for i in range(self.size):
-            if self.value_array[i] is not None:
-                self.add_internal(self.value_array[i][0], self.value_array[i][1], \
-                                  new_value_array, new_size, True)
-        self.value_array = new_value_array
+            if self.table[i] is not None:
+                self.add_internal(self.table[i][0], self.table[i][1], new_table, new_size, True)
+        self.table = new_table
         self.size = new_size
 
 
-
-"""
-hash_table = list([0 for i in range(8)])
-
-
-def get_key(data):
-    return hash(data)
-
-
-def hash_function(key):
-    return key % 8
-
-def save_data(data, value):
-    hash_address = hash_function(get_key(data))
-    hash_table[hash_address] = value
-
-
-def read_data(data):
-    hash_address = hash_function(get_key(data))
-    return hash_table[hash_address]
-"""
-
 if __name__ == "__main__":
-    hash = HashTable(2)
-    hash.add("Meo", "Smith")
-    print(hash.get("Meo"))
-    print("hash size :", hash.size)
-    hash.add("Kao", "Talk")
-    print(hash.get("Kao"))
-    print("hash size :", hash.size)
-    # save_data("Dave", 211011213)
-    # save_data("ANdy", 110212313)
-    # print(read_data("Dave"))
-    # print(hash_table)
+    hash = HashTable(5)
+    hash.add("Andy", "01Ta0123")
+    print(hash.table)
+    hash.add("bred", "1004Troy")
+    hash.add("Tom", "andToms666")
+    hash.add("Neyo", "becauseofyou")
+    print(hash.table)
 
 
