@@ -128,7 +128,7 @@ void HashTable::add_internal(std::string InKey, std::string InValue, data * InTa
         while(result == false)
         {
             index = (hash_horner(InKey) + attempt_count) % InSize;
-            if(table[index].IsEmpty())
+            if(InTable[index].IsEmpty())
             {
                 InTable[index].key = InKey;
                 InTable[index].value = InValue;
