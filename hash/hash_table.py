@@ -5,7 +5,7 @@
 class HashTable:
     def __init__(self, size=13):
         self.size = size
-        self.table = [None for _ in range(size)]
+        self.table = [0 for i in range(size)]
         self.entry_count = 0
 
     def hash(self, key):
@@ -21,7 +21,7 @@ class HashTable:
         self.add_internal(key, value, self.table, self.size)
 
     def add_internal(self, key, value, table, size, resizing=False):
-        if table[self.hash(key)] is None:
+        if table[self.hash(key)] == 0:
             table[self.hash(key)] = key, value
         else:
             result = False
@@ -42,7 +42,7 @@ class HashTable:
         new_size = self.size * 2
         new_table = [None for _ in range(new_size)]
         for i in range(self.size):
-            if self.table[i] is not None:
+            if self.table[i] != 0:
                 self.add_internal(self.table[i][0], self.table[i][1], new_table, new_size, True)
         self.table = new_table
         self.size = new_size
