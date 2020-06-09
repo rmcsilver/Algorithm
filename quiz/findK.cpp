@@ -15,6 +15,7 @@
  */
 
 #include <iostream>
+#include <iterator>
 #include <vector>
 #include <algorithm>
 
@@ -24,6 +25,41 @@ int commands[][3] = { { 2, 5, 3  },
                       { 1, 7, 3  } };
 
 
+int * solution(std::vector<int> & array, std::vector<int> & commands)
+{
+    int * result = new int[commands.size()/3];
+    for(int index=0; index<commands.size()/3; ++index)
+    {
+        int i = commands[index*3 + 0] - 1;
+        int j = commands[index*3 + 1] - 1;
+        int k = commands[index*3 + 2] - 1;
+
+        std::vector<int> temp;
+        std::copy(array.begin()+i, array.begin()+j+1, std::back_inserter(temp));
+        std::sort(temp.begin(), temp.end());
+        result[index] = temp[k];
+    }
+
+    return result;
+}
+
+int main()
+{
+    int n = sizeof(array) / sizeof(array[0]);
+    int n2 = sizeof(commands) / sizeof(commands[0][0]); 
+    std::vector<int> newArray(array, array + n);
+    std::vector<int> newCommands(commands[0], commands[0] + n2);
+    
+    int * result = solution(newArray, newCommands);
+    for(int i=0;i<sizeof(result)/sizeof(result[0])+1; ++i)
+    {
+        std::cout << "[" << i + 1 << "] -> " << result[i] << std::endl;  
+    }
+    
+    return 0;
+}
+
+/*
 int findK(int InArray[], int InArraySize, int InCommands[][3], int InCommandsSize, std::vector<int> &out)
 {
     // 예외처리
@@ -99,3 +135,4 @@ int main()
 
     return 0;
 }
+*/
