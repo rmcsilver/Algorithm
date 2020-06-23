@@ -31,8 +31,10 @@ int main()
     std::cout << text << std::endl;
     std::cout << "text size : " << text.size() << std::endl;
     
-    std::cout << ReplaceAll(text, "l", "r") << "개 변경" << std::endl;
+    std::cout << ReplaceAll(text, " ", "$") << "개 변경" << std::endl;
+    std::cout << ReplaceAll(text, "H", "W") << "개 변경" << std::endl;
 
+    std::cout << text << std::endl;
     return 0;
 }
 
@@ -76,28 +78,14 @@ int ReplaceAll(std::string &text, const std::string &find, const std::string &re
 {
     int index, count = 0;
     if(find.size() == 0 || replace.size() == 0)    return -1;
-   
-    std::cout << "중간 점검" << std::endl;
 
-    std::string::iterator iter = text.begin();
-    if(find.size() == 1)
+    std::size_t found = text.find(find);
+    while(found != std::string::npos)
     {
-        for(; iter != text.end(); iter++)
-        {
-            if(*iter == find[0])
-            {
-                text[index] = replace[0];
-                count++;
-            }
-            index++;
-        }
+        text.replace(found, find.size(), replace);
+        count++;
+        found = text.find(find, found+1);
     }
-    else
-    {
-
-    }
-
-    std::cout << "count : " << count << std::endl;
 
     return count;
 }
